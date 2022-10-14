@@ -1,0 +1,64 @@
+package com.bignerdranch.android.criminalintent
+
+import android.text.format.DateFormat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bignerdranch.android.criminalintent.databinding.ListItemCrimeBinding
+import java.util.*
+
+class CrimeHolder(
+    private val binding: ListItemCrimeBinding
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(crime: Crime, 
+             onCrimeClicked: (crimeId: UUID) -> Unit) {
+        
+        binding.crimeTitle.text = crime.title
+//        binding.crimeDate.text = crime.date.toString()
+        val calendar = Calendar.getInstance()
+        calendar.time = crime.date
+        binding.crimeDate.text = DateFormat.format("E dd-MMM-yyyy kk:MM", calendar).toString();
+
+        binding.root.setOnClickListener {
+            onCrimeClicked(crime.id)
+        }
+
+        binding.crimeSolved.visibility = if (crime.isSolved) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+    }    // end of fun bind( , , )
+    
+    fun swipeToDelete(crime: Crime, onSwipeToDelete: (crimeId: UUID) -> Unit) {
+        onSwipeToDelete(crime.id)
+    } 
+}
+
+class CrimeListAdapter(
+    private val crimes: List<Crime>,
+    private val onCrimeClicked: (crimeId: UUID) -> Unit,
+    private val onSwipeToDelete: (crimeId: UUID) -> Unit
+) : RecyclerView.Adapter<CrimeHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): CrimeHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ListItemCrimeBinding.inflate(inflater, parent, false)
+        return CrimeHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
+        val crime = crimes[position]
+        holder.bind(crime, onCrimeClicked)
+    }
+
+    override fun getItemCount() = crimes.size
+
+    fun deleteItem(holder: CrimeHolder, position: Int) {
+        val crime = crimes[position]
+        holder.swipeToDelete(crime, onSwipeToDelete)
+    }
+}
