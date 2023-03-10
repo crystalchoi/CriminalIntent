@@ -113,6 +113,13 @@ class CrimeDetailFragment : Fragment() {
                 Log.d(TAG, "takePhoto.launch= ${photoUri.toString()}")
                 takePhoto.launch(photoUri)
             }
+
+            // enable/disable camera icon whether ...
+            val captureImageIntent = takePhoto.contract.createIntent(
+                requireContext(),
+                null
+            )
+            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
